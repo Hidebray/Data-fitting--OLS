@@ -1,0 +1,111 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[vietnamese]{babel}
+\usepackage{amsmath, amssymb, graphicx, booktabs, hyperref, geometry}
+
+% Đặt margin 2cm theo yêu cầu
+\geometry{margin=2cm}
+
+\begin{document}
+
+% --- TITLE PAGE ---
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    
+    {\large \textbf{Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM}} \\[0.5cm]
+    {\large \textbf{Khoa Công nghệ Thông tin}} \\[2cm]
+    
+    {\Large \textbf{Môn học: Toán Ứng Dụng và Thống Kê (MTH00051)}} \\[1.5cm]
+    
+    \rule{\textwidth}{1pt} \\[0.5cm]
+    {\Huge \textbf{ĐỒ ÁN 2}} \\[0.5cm]
+    {\Large \textbf{Data Fitting và Phương Pháp OLS}} \\[0.4cm]
+    \rule{\textwidth}{1pt} \\[3cm]
+    
+    \begin{flushright}
+        {\large 
+        \textbf{Sinh viên thực hiện:} Hiep Tran Dai \\
+        \textbf{MSSV:} 23120256 \\
+        }
+    \end{flushright}
+    
+    \vfill
+    
+    {\large \today}
+\end{titlepage}
+
+% --- TABLE OF CONTENTS ---
+\tableofcontents
+\newpage
+
+% --- CONTENT ---
+
+\section{Phần 1: Lý Thuyết Data Fitting và Minh Họa}
+
+\subsection{Bài Toán Data Fitting}
+Data Fitting (hay Khớp Dữ Liệu) là bài toán tìm kiếm một hàm toán học hoặc mô hình phù hợp nhất để mô tả mối quan hệ giữa các biến đầu vào (đặc trưng) và biến đầu ra (mục tiêu). Mục tiêu cốt lõi của bài toán là tối thiểu hóa sự sai lệch (lỗi) giữa giá trị thực tế quan sát được và giá trị do mô hình dự đoán.
+
+\subsection{Ordinary Least Squares}
+Phương pháp Bình phương tối thiểu thông thường (Ordinary Least Squares - OLS) là kỹ thuật phổ biến nhất để giải quyết bài toán Data Fitting tuyến tính. Bằng cách sử dụng đại số tuyến tính, giả sử ma trận thiết kế là $X$ và vector mục tiêu là $y$, công thức nghiệm ước lượng $\hat{\beta}$ tối ưu nhằm cực tiểu hóa tổng bình phương phần dư (RSS) được xác định như sau:
+\begin{equation}
+    \hat{\beta} = (X^T X)^{-1} X^T y
+\end{equation}
+Trong thực hành, ma trận $X$ thường được bổ sung thêm một cột gồm toàn các số 1 ở đầu để đại diện cho hệ số chặn (intercept).
+
+\subsection{Đánh Giá Mô Hình \& Định Lý Gauss-Markov}
+Sau khi tìm được $\hat{\beta}$, mô hình thường được đánh giá bằng các chỉ số thông dụng như MAE, RMSE, và $R^2$. Định lý Gauss-Markov khẳng định rằng, dưới các giả định kinh điển của mô hình hồi quy tuyến tính (sai số có kỳ vọng bằng 0, phương sai đồng nhất và không có hiện tượng tự tương quan), ước lượng OLS chính là ước lượng tuyến tính không chệch tốt nhất (BLUE - Best Linear Unbiased Estimator).
+
+\subsection{Ridge Regression và Cross Validation}
+Khi ma trận $X^T X$ gần suy biến (do hiện tượng đa cộng tuyến giữa các biến độc lập), ma trận sẽ rất khó nghịch đảo, khiến ước lượng OLS trở nên không ổn định. Kỹ thuật Ridge Regression giải quyết vấn đề này bằng cách thêm một thành phần phạt $L2$ vào hàm mất mát, dẫn đến nghiệm mới:
+\begin{equation}
+    \hat{\beta}_{ridge} = (X^T X + \lambda I)^{-1} X^T y
+\end{equation}
+Để chọn được siêu tham số $\lambda$ tối ưu, kỹ thuật K-Fold Cross Validation thường được áp dụng bằng cách chia tập dữ liệu huấn luyện thành $k$ phần (folds), mô hình học trên $k-1$ phần và kiểm thử trên phần còn lại để lấy trung bình lỗi MSE nhỏ nhất.
+
+\section{Phần 2: Ứng Dụng Dữ Liệu Thực Tế}
+
+\subsection{Giới thiệu bộ dữ liệu AirQualityUCI}
+Bộ dữ liệu AirQualityUCI chứa các bản ghi đo lường chất lượng không khí tại một thành phố bị ô nhiễm ở Ý. Mục tiêu chính của đồ án là xây dựng mô hình dự đoán nồng độ khí CO (thông qua biến mục tiêu \texttt{CO(GT)}) dựa trên các chỉ số cảm biến đa lượng khác có trong tập dữ liệu.
+
+\subsection{Tiền xử lý dữ liệu}
+Trong bộ dữ liệu thô này, các giá trị bị thiếu (missing values) được đánh dấu mặc định bằng số \texttt{-200}. Bước tiền xử lý dữ liệu (đóng gói qua OOP Data Pipeline) thực hiện chuyển đổi toàn bộ \texttt{-200} thành \texttt{NaN}, loại bỏ hoàn toàn các cột nhiễu lớn như \texttt{NMHC(GT)}, và áp dụng kỹ thuật Listwise deletion cho biến mục tiêu. Các biến đầu vào sau đó được điền khuyết tự động bằng thuật toán \texttt{KNNImputer}, xử lý giá trị ngoại lai (Outliers) bằng cắt khoảng Winsorization và cuối cùng chuẩn hóa Z-score bằng \texttt{StandardScaler}.
+
+\subsection{Xây dựng và đánh giá mô hình}
+Dựa trên tập dữ liệu đã qua tiền xử lý chặt chẽ, ba mô hình hồi quy đã được xây dựng và đưa lên bàn cân so sánh:
+\begin{enumerate}
+    \item \textbf{Mô hình 1 (OLS Cơ bản):} Sử dụng tất cả các đặc trưng để huấn luyện.
+    \item \textbf{Mô hình 2 (OLS Chọn biến):} Lọc bỏ các biến có Hệ số phóng đại phương sai (VIF) $> 10$ để giảm hiện tượng đa cộng tuyến.
+    \item \textbf{Mô hình 3 (Ridge Regression):} Tối ưu hóa siêu tham số $\lambda$ thông qua 5-Fold Cross Validation trên tập Train.
+\end{enumerate}
+Bảng so sánh kết quả cuối cùng chứng minh cả ba mô hình đều cho thấy hiệu suất khả quan trên tập kiểm thử thông qua các chỉ số $R^2$, MAE, và RMSE.
+
+\subsection{Phân tích phần dư \& Kỹ thuật nâng cao}
+Phần dư (Residuals) được phân tích để kiểm định độ tin cậy của mô hình tuyến tính. Đặc biệt, để lấy điểm kỹ thuật nâng cao, lớp \texttt{Bayesian Linear Regression} cũng được cài đặt hoàn toàn từ đầu (from scratch) bằng Numpy. Mô hình Bayes không chỉ dự đoán được giá trị điểm (Point Estimate) mà còn tính toán thành công phương sai dự đoán, cung cấp một góc nhìn toán học sâu sắc về độ không chắc chắn (Uncertainty) trong học máy.
+
+\section{Kết Luận}
+Đồ án đã hoàn thành xuất sắc mục tiêu đề ra, bao quát từ quy trình lập trình cốt lõi các thuật toán Toán Ứng dụng khắt khe chỉ bằng thư viện cơ bản Numpy, cho đến việc tự thiết kế hệ thống Data Pipeline chống thất thoát dữ liệu (Data Leakage) và áp dụng mượt mà trên bộ dữ liệu thực tế AirQualityUCI. Phương pháp OLS, Ridge và Bayesian đều chứng minh được tầm quan trọng sống còn của Đại số tuyến tính trong khoa học dữ liệu.
+
+\newpage
+% --- REFERENCES ---
+\begin{thebibliography}{9}
+
+\bibitem{strang} 
+Gilbert Strang. 
+\textit{Linear Algebra and Its Applications}. 
+Cengage Learning, 4th Edition.
+
+\bibitem{james} 
+Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 
+\textit{An Introduction to Statistical Learning: with Applications in R}. 
+Springer, 2013.
+
+\bibitem{bishop} 
+Christopher M. Bishop. 
+\textit{Pattern Recognition and Machine Learning}. 
+Springer, 2006.
+
+\end{thebibliography}
+
+\end{document}
