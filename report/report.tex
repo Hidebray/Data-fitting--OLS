@@ -46,27 +46,27 @@
 \section*{Phân Công Công Việc}
 \addcontentsline{toc}{section}{Phân Công Công Việc}
 
-Dưới đây là bảng phân công công việc chi tiết của 5 thành viên trong nhóm:
+Dưới đây là bảng phân công công việc chi tiết của 5 thành viên trong nhóm, tuân thủ nguyên tắc phát triển phần mềm độc lập giữa tầng logic (Code) và tầng trình bày (Notebook):
 
 \begin{table}[H]
     \centering
     \renewcommand{\arraystretch}{1.5}
-    \begin{tabular}{|c|p{4cm}|c|p{6cm}|c|}
+    \begin{tabular}{|c|p{3.5cm}|c|p{7cm}|c|}
         \hline
         \textbf{STT} & \textbf{Họ và tên} & \textbf{MSSV} & \textbf{Nhiệm vụ} & \textbf{Hoàn thành} \\
         \hline
-        1 & Hiep Tran Dai & 23120256 & [Mô tả chi tiết nhiệm vụ] & 100\% \\
+        1 & \textbf{Hiep Tran Dai} \newline \textit{(Nhóm trưởng)} & 23120256 & Quản lý tiến độ chung. Kiểm duyệt chất lượng mã nguồn (QA). Trực tiếp soạn thảo, format báo cáo bằng LaTeX và đóng gói thư mục nộp bài. & 100\% \\
         \hline
-        2 & [Tên Thành Viên 2] & [MSSV 2] & [Mô tả chi tiết nhiệm vụ] & 100\% \\
+        2 & [Tên Thành Viên 2] & [MSSV 2] & \textbf{Code Part 1:} Cài đặt thuật toán từ đầu (from scratch) bằng NumPy: OLS, Ridge, K-Fold CV, VIF và biểu đồ phần dư (\texttt{part1/*.py}). & 100\% \\
         \hline
-        3 & [Tên Thành Viên 3] & [MSSV 3] & [Mô tả chi tiết nhiệm vụ] & 100\% \\
+        3 & [Tên Thành Viên 3] & [MSSV 3] & \textbf{Notebook 1:} Trình bày lý thuyết Toán, gọi hàm minh họa tập giả lập, so sánh với sklearn, mô phỏng Monte Carlo (\texttt{part1\_notebook.ipynb}). & 100\% \\
         \hline
-        4 & [Tên Thành Viên 4] & [MSSV 4] & [Mô tả chi tiết nhiệm vụ] & 100\% \\
+        4 & [Tên Thành Viên 4] & [MSSV 4] & \textbf{Code Part 2:} Xây dựng OOP DataPipeline (tránh rò rỉ dữ liệu), KNNImputer, Winsorization và cài đặt Bayesian Regression (\texttt{part2/*.py}). & 100\% \\
         \hline
-        5 & [Tên Thành Viên 5] & [MSSV 5] & [Mô tả chi tiết nhiệm vụ] & 100\% \\
+        5 & [Tên Thành Viên 5] & [MSSV 5] & \textbf{Notebook 2:} Chạy EDA dữ liệu AirQualityUCI, đánh giá MAE/RMSE/$R^2$ 3 mô hình, phân tích Feature Importance (\texttt{part2\_notebook.ipynb}). & 100\% \\
         \hline
     \end{tabular}
-    \caption{Bảng phân công công việc của nhóm.}
+    \caption{Bảng phân công công việc và đánh giá mức độ hoàn thành của nhóm.}
     \label{tab:phan_cong}
 \end{table}
 
@@ -234,8 +234,6 @@ Trong trường hợp tập dữ liệu thực tế vi phạm giả thiết GM2 
 \begin{equation}
     \hat{\beta}_{ridge} = \arg\min_{\beta} \left\{ \|y - X\beta\|_2^2 + \lambda \|\beta_{1:p}\|_2^2 \right\} = (X^T X + \lambda I_{mod})^{-1} X^T y
 \end{equation}
-Trong đó, $\lambda \ge 0$ là siêu tham số kiểm soát mức độ phạt. Đặc biệt, ma trận $I_{mod}$ là ma trận đơn vị nhưng có phần tử đầu tiên $I_{0,0} = 0$ nhằm đảm bảo \textbf{không áp dụng hình phạt lên hệ số chặn (intercept)}.
-
 Để tìm ra siêu tham số $\lambda$ tối ưu có khả năng tổng quát hóa tốt nhất, kỹ thuật \textit{k-Fold Cross-Validation} được áp dụng. Tập dữ liệu huấn luyện được chia ngẫu nhiên làm $k$ phần (folds). Lần lượt mô hình được huấn luyện trên $k-1$ phần và đánh giá MSE trên phần còn lại. Mức lỗi chéo trung bình (CV Score) được tính toán như sau:
 \begin{equation}
     CV_{(k)} = \frac{1}{k} \sum_{i=1}^{k} MSE_i
@@ -312,14 +310,8 @@ Phương pháp định lượng IQR (Interquartile Range) được lập trình 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{Images/eda_distribution_1.png}
-    \caption{Biểu đồ Histogram (phân phối) và Boxplot (chẩn đoán ngoại lệ) của tất cả đặc trưng (Phần 1).}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{Images/eda_distribution_2.png}
-    \caption{Biểu đồ Histogram (phân phối) và Boxplot (chẩn đoán ngoại lệ) của tất cả đặc trưng (Phần 2).}
+    \includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{Images/eda_distribution_short.png}
+    \caption{Khảo sát phân phối và ngoại lệ của các đặc trưng quan trọng nhất (CO, PT08.S1, C6H6, T, RH). (Các đặc trưng còn lại được trình bày chi tiết trong file Notebook).}
 \end{figure}
 
 \textbf{3. Phân tích Hiện tượng Đa cộng tuyến:} \\
@@ -331,7 +323,15 @@ Ma trận tương quan Pearson hiển thị cảnh báo: rất nhiều bộ ph�
 \end{figure}
 
 \subsection{Xây Dựng và Đánh Giá Mô Hình}
-Tiền xử lý tuân thủ tuyệt đối cơ chế chống rò rỉ dữ liệu (Data Leakage). Pipeline thiết lập các bước tuần tự bao gồm: \texttt{KNNImputer(k=5)}, \texttt{Winsorization(1\%-99\%)} cắt ngọn các nhiễu gai, và chuẩn hóa với \texttt{StandardScaler}. Cả 3 phương pháp hồi quy tuyến tính được huấn luyện độc lập:
+Tiền xử lý tuân thủ tuyệt đối cơ chế chống rò rỉ dữ liệu (Data Leakage). Pipeline thiết lập các bước tuần tự bao gồm: \texttt{KNNImputer(k=5)}, \texttt{Winsorization(1\%-99\%)} cắt ngọn các nhiễu gai, và chuẩn hóa với \texttt{StandardScaler}. 
+
+\textbf{Lý giải thiết lập tham số:} 
+\begin{itemize}
+    \item \textbf{KNNImputer ($k=5$):} Số láng giềng $k=5$ được lựa chọn vì đây là mức cân bằng tối ưu. Tham số này đủ lớn để tham khảo xu hướng chung của các điểm đo lường có nồng độ hóa học tương đồng, nhưng cũng đủ nhỏ để không bị nhiễu bởi các mẫu dữ liệu ở quá xa về không gian hoặc thời gian (khắc phục nhược điểm của việc điền bằng Mean/Median toàn cục).
+    \item \textbf{Winsorization (1\% - 99\%):} Ngưỡng cắt này giúp mô hình khử được các giá trị vô lý cực đoan do lỗi phần cứng cảm biến (như đã phát hiện ở phần Boxplot), đồng thời vẫn bảo toàn được lượng lớn thông tin tự nhiên cốt lõi của bộ dữ liệu khí tượng vốn có phương sai cao.
+\end{itemize}
+
+Cả 3 phương pháp hồi quy tuyến tính được huấn luyện độc lập:
 
 \begin{table}[H]
     \centering
@@ -350,8 +350,28 @@ Tiền xử lý tuân thủ tuyệt đối cơ chế chống rò rỉ dữ liệ
 \textbf{Đánh giá kết quả:}
 \begin{itemize}
     \item \textbf{Mất mát thông tin ở Mô hình Lọc VIF:} Việc cắt bỏ các cột đặc trưng có $VIF > 10$ một cách thô bạo khiến hiệu năng mô hình sụt giảm rõ rệt (Sai số MAE và RMSE đều tăng, $R^2$ tụt từ 0.8977 xuống 0.8757). Điều này tái khẳng định rằng các biến dù bị đa cộng tuyến nhưng thực tế vẫn chứa "tín hiệu mờ" quan trọng cho bài toán.
-    \item \textbf{Tối ưu của Regularization:} Ridge với tham số tối ưu thông qua quá trình K-Fold Cross Validation ($\lambda=0.70$) xử lý cực kỳ thông minh hiện tượng bùng nổ phương sai của hệ số góc $\beta$, giữ vững cấu trúc mô hình, đồng thời duy trì được hiệu năng lý tưởng tương đương OLS nguyên bản.
+    \item \textbf{Tối ưu của Regularization:} Ridge với tham số tối ưu thông qua quá trình K-Fold Cross Validation xử lý cực kỳ thông minh hiện tượng bùng nổ phương sai của hệ số góc $\beta$, giữ vững cấu trúc mô hình, đồng thời duy trì được hiệu năng lý tưởng tương đương OLS nguyên bản.
 \end{itemize}
+
+\textbf{Quyết định chọn mô hình cuối cùng:} Dựa vào phân tích trên, nhóm quyết định chọn \textbf{Ridge Regression} làm mô hình dự đoán chính thức cho hệ thống. Ridge có ưu thế tuyệt đối về tốc độ huấn luyện do tồn tại nghiệm đóng (closed-form solution), cực kỳ phù hợp để nhúng vào các hệ thống thiết bị IoT quét cảm biến liên tục ở tần số cao.
+
+\subsection{Chẩn đoán giả thiết phần dư Gauss-Markov trên dữ liệu thực}
+Sau khi huấn luyện mô hình Ridge Regression trên dữ liệu thực tế, nhóm tiến hành trích xuất phần dư (Residuals) và lập 4 biểu đồ chẩn đoán nhằm kiểm định các giả thiết cổ điển:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=0.65\textheight,keepaspectratio]{Images/ols_residuals.png}
+    \caption{Bốn biểu đồ chẩn đoán phần dư (Gauss-Markov) trên tập dữ liệu đo lường không khí thực tế.}
+\end{figure}
+
+\textbf{Biện luận phân tích:}
+\begin{itemize}
+    \item \textbf{Residuals vs Fitted:} Đường xu hướng trung bình có độ cong nhẹ chứ không phẳng hoàn toàn ở mức 0. Điều này chỉ ra rằng mối quan hệ thực tế giữa nồng độ CO và các cảm biến có bản chất phi tuyến nhất định, khiến mô hình thuần tuyến tính chưa thể nắm bắt trọn vẹn.
+    \item \textbf{Normal Q-Q Plot:} Biểu đồ thể hiện sự lệch đuôi (Heavy tails) vô cùng rõ rệt ở cả hai phía. Phân phối của nhiễu hoàn toàn vi phạm giả thiết phân phối chuẩn, cho thấy các cảm biến khí dễ bị tác động bởi các cú sốc ngẫu nhiên ngoại cảnh.
+    \item \textbf{Scale-Location:} Sự phân tán không đồng đều, loe rộng ra như hình phễu ở phần đuôi phải cảnh báo hiện tượng phương sai thay đổi (Heteroskedasticity). Phương sai của sai số lớn dần khi nồng độ dự báo tăng cao.
+    \item \textbf{Cook's Distance:} Nhờ có cơ chế cắt ngọn (Winsorization 1\%-99\%) từ trước, đại đa số các điểm dữ liệu đã nằm an toàn dưới ngưỡng cảnh báo, chỉ còn sót lại lác đác vài quan sát cá biệt có đòn bẩy cao.
+\end{itemize}
+
 
 \subsection{Giải thích Mô hình (Feature Importance)}
 Khác với mạng Neural Network, Hồi quy tuyến tính mang tính minh bạch (interpretability) cực cao. Nhóm đã trích xuất lại hệ số hồi quy Ridge sau khi dữ liệu đã chuẩn hóa chung về không gian trung bình 0, độ lệch chuẩn 1 để hình thành thước đo Feature Importance:
@@ -404,13 +424,11 @@ Tuy nhiên, giá trị cốt lõi mà mô hình này mang lại nằm ở \textb
 
 \bibitem{strang} 
 Gilbert Strang. 
-\textit{Linear Algebra and Its Applications}. 
-Cengage Learning, 4th Edition, 2005.
+\textit{Introduction to Linear Algebra}, 6th ed. Wellesley-Cambridge Press, 2023.
 
 \bibitem{james} 
 Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 
-\textit{An Introduction to Statistical Learning: with Applications in R}. 
-Springer, 2013.
+\textit{An Introduction to Statistical Learning: with Applications in R}, 2nd ed. Springer, 2021.
 
 \bibitem{bishop} 
 Christopher M. Bishop. 
