@@ -2,7 +2,7 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[vietnamese]{babel}
-\usepackage{amsmath, amssymb, graphicx, booktabs, hyperref, geometry}
+\usepackage{amsmath, amssymb, graphicx, booktabs, hyperref, geometry, float}
 
 % Đặt margin 2cm theo yêu cầu
 \geometry{margin=2cm}
@@ -26,8 +26,10 @@
     
     \begin{flushright}
         {\large 
-        \textbf{Sinh viên thực hiện:} Hiep Tran Dai \\
-        \textbf{MSSV:} 23120256 \\
+        \textbf{Giảng viên hướng dẫn:} \\
+        ThS. Võ Nam Thục Đoan \\
+        ThS. Lê Nhựt Nam \\[0.5cm]
+        \textbf{Nhóm thực hiện:} [Tên Nhóm]
         }
     \end{flushright}
     
@@ -40,52 +42,361 @@
 \tableofcontents
 \newpage
 
+% --- PHÂN CÔNG CÔNG VIỆC ---
+\section*{Phân Công Công Việc}
+\addcontentsline{toc}{section}{Phân Công Công Việc}
+
+Dưới đây là bảng phân công công việc chi tiết của 5 thành viên trong nhóm:
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{|c|p{4cm}|c|p{6cm}|c|}
+        \hline
+        \textbf{STT} & \textbf{Họ và tên} & \textbf{MSSV} & \textbf{Nhiệm vụ} & \textbf{Hoàn thành} \\
+        \hline
+        1 & Hiep Tran Dai & 23120256 & [Mô tả chi tiết nhiệm vụ] & 100\% \\
+        \hline
+        2 & [Tên Thành Viên 2] & [MSSV 2] & [Mô tả chi tiết nhiệm vụ] & 100\% \\
+        \hline
+        3 & [Tên Thành Viên 3] & [MSSV 3] & [Mô tả chi tiết nhiệm vụ] & 100\% \\
+        \hline
+        4 & [Tên Thành Viên 4] & [MSSV 4] & [Mô tả chi tiết nhiệm vụ] & 100\% \\
+        \hline
+        5 & [Tên Thành Viên 5] & [MSSV 5] & [Mô tả chi tiết nhiệm vụ] & 100\% \\
+        \hline
+    \end{tabular}
+    \caption{Bảng phân công công việc của nhóm.}
+    \label{tab:phan_cong}
+\end{table}
+
+\newpage
+
 % --- CONTENT ---
 
 \section{Phần 1: Lý Thuyết Data Fitting và Minh Họa}
 
-\subsection{Bài Toán Data Fitting}
-Data Fitting (hay Khớp Dữ Liệu) là bài toán tìm kiếm một hàm toán học hoặc mô hình phù hợp nhất để mô tả mối quan hệ giữa các biến đầu vào (đặc trưng) và biến đầu ra (mục tiêu). Mục tiêu cốt lõi của bài toán là tối thiểu hóa sự sai lệch (lỗi) giữa giá trị thực tế quan sát được và giá trị do mô hình dự đoán.
+Data Fitting (hay Khớp Dữ Liệu) là bài toán tìm kiếm một hàm toán học phù hợp nhất để mô tả mối quan hệ giữa các biến đầu vào và biến mục tiêu. Mục tiêu của quá trình này là xây dựng một mô hình có khả năng xấp xỉ quy luật của dữ liệu thực nghiệm, từ đó phục vụ cho việc dự đoán, phân tích và tối ưu hóa trong nhiều lĩnh vực như khoa học dữ liệu, kỹ thuật và \texttt{Machine Learning}. \\ 
+Trong phần này, nhóm tiến hành cài đặt hoàn toàn từ đầu (from scratch) các thuật toán cốt lõi bằng ma trận thông qua thư viện \texttt{numpy}, đồng thời kiểm chứng kết quả trên bộ dữ liệu mô phỏng theo chuẩn phân phối Gauss-Markov.
 
-\subsection{Ordinary Least Squares}
-Phương pháp Bình phương tối thiểu thông thường (Ordinary Least Squares - OLS) là kỹ thuật phổ biến nhất để giải quyết bài toán Data Fitting tuyến tính. Bằng cách sử dụng đại số tuyến tính, giả sử ma trận thiết kế là $X$ và vector mục tiêu là $y$, công thức nghiệm ước lượng $\hat{\beta}$ tối ưu nhằm cực tiểu hóa tổng bình phương phần dư (RSS) được xác định như sau:
+\subsection{Bài Toán Data Fitting và Giả Thiết Gauss-Markov}
+
+\subsubsection{Phát biểu bài toán tổng quát}
+Cho tập dữ liệu $\mathcal{D}=\{(x_{i},y_{i})\}_{i=1}^{n}$ với $x_{i}\in\mathbb{R}^{p}$ và $y_{i}\in\mathbb{R}$. Bài toán hồi quy tuyến tính giả thiết mối quan hệ có dạng:
+\begin{equation}
+    y_{i} = \beta_{0} + \beta_{1}x_{i1} + \beta_{2}x_{i2} + \dots + \beta_{p}x_{ip} + \epsilon_{i} = x_{i}^{T}\beta + \epsilon_{i}
+\end{equation}
+Viết dưới dạng ma trận tổng quát:
+\begin{equation}
+    y = X\beta + \epsilon
+\end{equation}
+Trong đó, $y \in \mathbb{R}^{n}$ là vector mục tiêu, $\beta = (\beta_{0}, \beta_{1}, \dots, \beta_{p})^{T} \in \mathbb{R}^{p+1}$ là vector hệ số cần ước lượng, $\epsilon \in \mathbb{R}^{n}$ là vector nhiễu ngẫu nhiên, và $X \in \mathbb{R}^{n \times (p+1)}$ là ma trận thiết kế (design matrix) đã được bổ sung một cột gồm toàn số 1 ở cột đầu tiên để đại diện cho hệ số chặn (intercept).
+
+\subsubsection{Các Giả Thiết Gauss-Markov}
+Để ước lượng OLS đạt được các tính chất thống kê tối ưu, mô hình phải tuân thủ 5 giả thiết Gauss-Markov kinh điển sau:
+\begin{itemize}
+    \item \textbf{GM1 (Tuyến tính):} Mô hình phải tuyến tính theo các tham số $\beta$.
+    \item \textbf{GM2 (Không đa cộng tuyến hoàn hảo):} Ma trận $X$ có hạng tối đa, tức $rank(X) = p + 1$, đảm bảo các cột độc lập tuyến tính và ma trận $X^TX$ khả nghịch.
+    \item \textbf{GM3 (Ngoại sinh nghiêm ngặt):} Kỳ vọng điều kiện của nhiễu bằng 0, tức $\mathbb{E}[\epsilon|X] = 0$.
+    \item \textbf{GM4 (Đồng phương sai và không tự tương quan):} Ma trận hiệp phương sai của nhiễu có dạng $Var(\epsilon|X) = \sigma^2 I_n$, nghĩa là các sai số có phương sai bằng nhau ($\sigma^2$) và độc lập với nhau.
+    \item \textbf{GM5 (Nhiễu tuân theo phân phối chuẩn):} Nhiễu ngẫu nhiên tuân theo phân phối chuẩn độc lập $\epsilon | X \sim \mathcal{N}(0, \sigma^2 I_n)$.
+\end{itemize}
+
+\subsection{Ordinary Least Squares (OLS)}
+Phương pháp Bình phương tối thiểu thông thường (Ordinary Least Squares - OLS) là nền tảng của phân tích hồi quy tuyến tính. Mục tiêu cốt lõi của phương pháp này là tìm ra siêu phẳng tối ưu (vector $\hat{\beta}$) nhằm tối thiểu hóa tổng bình phương phần dư (Residual Sum of Squares - RSS) giữa giá trị dự đoán và giá trị thực tế. \\
+\begin{equation}
+    RSS(\beta) = \|y - X\beta\|_2^2 = (y - X\beta)^T(y - X\beta)
+\end{equation}
+ Đạo hàm riêng của $RSS(\beta)$ theo $\beta$ và cho bằng $0$:
+ \begin{equation}
+     \frac{\partial RSS}{\partial \beta} = -2X^T y + 2X^T X \beta = 0
+ \end{equation}
+ Từ đó suy ra được hệ phương trình chuẩn (Normal Equations):
+ \begin{equation}
+     X^T X \beta = X^T y
+ \end{equation}
+ Ta thu được nghiệm ước lượng tối ưu giúp cực tiểu hóa tổng bình phương phần dư (RSS):
 \begin{equation}
     \hat{\beta} = (X^T X)^{-1} X^T y
 \end{equation}
-Trong thực hành, ma trận $X$ thường được bổ sung thêm một cột gồm toàn các số 1 ở đầu để đại diện cho hệ số chặn (intercept).
 
-\subsection{Đánh Giá Mô Hình \& Định Lý Gauss-Markov}
-Sau khi tìm được $\hat{\beta}$, mô hình thường được đánh giá bằng các chỉ số thông dụng như MAE, RMSE, và $R^2$. Định lý Gauss-Markov khẳng định rằng, dưới các giả định kinh điển của mô hình hồi quy tuyến tính (sai số có kỳ vọng bằng 0, phương sai đồng nhất và không có hiện tượng tự tương quan), ước lượng OLS chính là ước lượng tuyến tính không chệch tốt nhất (BLUE - Best Linear Unbiased Estimator).
+Mã nguồn được thiết kế tự tính toán các phép nhân và nghịch đảo ma trận. Trên bộ dữ liệu giả lập (100 quan sát, 3 đặc trưng), kết quả cài đặt thủ công và thư viện \texttt{scikit-learn} khớp nhau chính xác tuyệt đối đến 6 chữ số thập phân, chứng minh tính đúng đắn của thuật toán. Vector $\boldsymbol{\beta}$ thực tế (True Beta) được cấu hình là $[2.5, 1.8, -0.9, 0.4]^T$.
 
-\subsection{Ridge Regression và Cross Validation}
-Khi ma trận $X^T X$ gần suy biến (do hiện tượng đa cộng tuyến giữa các biến độc lập), ma trận sẽ rất khó nghịch đảo, khiến ước lượng OLS trở nên không ổn định. Kỹ thuật Ridge Regression giải quyết vấn đề này bằng cách thêm một thành phần phạt $L2$ vào hàm mất mát, dẫn đến nghiệm mới:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lrrr}
+        \toprule
+        \textbf{Hệ số} & \textbf{True Beta} & \textbf{OLS (Tự Cài Đặt)} & \textbf{Sklearn (Kiểm Chứng)} \\
+        \midrule
+        $\beta_0$ (Intercept) & 2.5 & 2.850456 & 2.850456 \\
+        $\beta_1$ & 1.8 & 1.780584 & 1.780584 \\
+        $\beta_2$ & -0.9 & -0.912491 & -0.912491 \\
+        $\beta_3$ & 0.4 & 0.373102 & 0.373102 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Bảng đối chiếu hệ số hồi quy OLS trên dữ liệu mô phỏng.}
+    \label{tab:ols_coef}
+\end{table}
+
+\subsection{Hat Matrix}
+Ma trận chiếu (Hat matrix) chiếu vector $\mathbf{y}$ lên không gian cột của $\mathbf{X}$:
 \begin{equation}
-    \hat{\beta}_{ridge} = (X^T X + \lambda I)^{-1} X^T y
+    \mathbf{H} = \mathbf{X}(\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T
 \end{equation}
-Để chọn được siêu tham số $\lambda$ tối ưu, kỹ thuật K-Fold Cross Validation thường được áp dụng bằng cách chia tập dữ liệu huấn luyện thành $k$ phần (folds), mô hình học trên $k-1$ phần và kiểm thử trên phần còn lại để lấy trung bình lỗi MSE nhỏ nhất.
+Ma trận $H$ sẽ sở hữu các tính chất hình học quan trọng bao gồm:
+\begin{itemize}
+    \item $H^2 = H$ \textit{(lũy đẳng)}.
+    \item $H^T = H$ \textit{(đối xứng)}.
+    \item Giá trị riêng của $H$ chỉ nhận giá trị 0 hoặc 1.
+    \item $rank(H) = p +1$.
+    \item Giá trị dự báo: $\hat{y} = Hy$; vector phần dư: $\hat{\epsilon} = (I - H)y$.
+\end{itemize}
+Thực nghiệm kiểm tra trên Jupyter Notebook cho kết quả \texttt{np.allclose(H @ H, H)} là \textbf{True}, qua đó xác minh chặt chẽ tính chất idempotent (lũy đẳng) của ma trận thiết kế.
 
+\subsection{Đánh Giá Mô Hình \& Suy luận thống kê}
+\textbf{a) Lý thuyết đánh giá và kiểm định giả thuyết:} \\
+Để đo lường năng lực giải thích của mô hình hồi quy OLS, hệ số xác định $R^2$ và $R^2$ hiệu chỉnh ($\overline{R}^2$) được tính toán nhằm xác định tỷ lệ phương sai của biến mục tiêu được giải thích bởi tập hợp các đặc trưng đầu vào:
+\begin{equation}
+    R^2 = 1 - \frac{RSS}{TSS} = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}
+\end{equation}
+\begin{equation}
+    \overline{R}^2 = 1 - \frac{n - 1}{n - p - 1}(1 - R^2)
+\end{equation}
+
+Kiểm định ý nghĩa thống kê của từng hệ số hồi quy riêng biệt được thực hiện qua kiểm định Student ($t$-test) với giả thuyết vô hiệu $H_0: \beta_j = 0$. Sai số chuẩn ($SE$), giá trị thống kê $t_j$, và khoảng tin cậy $95\%$ của các ước lượng hệ số $\hat{\beta}_j$ được xác định bởi:
+\begin{equation}
+    SE(\hat{\beta}_j) = \sqrt{\hat{\sigma}^2 [(X^T X)^{-1}]_{jj}}, \quad t_j = \frac{\hat{\beta}_j}{SE(\hat{\beta}_j)} \sim t_{n-p-1}
+\end{equation}
+\begin{equation}
+    \text{CI}_{95\%} = \left[ \hat{\beta}_j - t_{\alpha/2, n-p-1} \cdot SE(\hat{\beta}_j), \, \hat{\beta}_j + t_{\alpha/2, n-p-1} \cdot SE(\hat{\beta}_j) \right]
+\end{equation}
+
+Đồng thời, để kiểm định ý nghĩa tổng thể của mô hình hồi quy (ứng với giả thuyết vô hiệu $H_0: \beta_1 = \beta_2 = \dots = \beta_p = 0$), thống kê kiểm định $F$ được thiết lập:
+\begin{equation}
+    F = \frac{(TSS - RSS) / p}{RSS / (n - p - 1)} \sim F_{p, n-p-1}
+\end{equation}
+
+\textbf{b) Kết quả thực nghiệm:} \\
+Mô hình giả lập được đánh giá tổng thể thông qua hàm \texttt{model\_metrics} với các thông số:
+\begin{itemize}
+    \item \textbf{RSS:} 18.919082 \quad | \quad \textbf{TSS:} 1286.003770
+    \item \textbf{$R^2$-Score:} 0.985288 \quad | \quad \textbf{Adjusted $R^2$:} 0.984829
+    \item \textbf{Thống kê F (F-statistic):} 2143.164748
+\end{itemize}
+
+Giá trị F lớn ($>2100$) và $p$-value rất nhỏ ($<0.001$) cho thấy mô hình có ý nghĩa thống kê toàn diện, bác bỏ giả thuyết vô hiệu $H_0: \beta_1 = \dots = \beta_p = 0$. \\
+Chi tiết về các giá trị ước lượng hệ số, sai số chuẩn, thống kê kiểm định và khoảng tin cậy tương ứng thu được từ hàm \texttt{coef\_inference} được tổng hợp tại Bảng \ref{tab:ols_test}.
+
+\begin{table}[H]
+    \centering
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{lrrrrr}
+        \toprule
+        & \textbf{Hệ số $\hat{\beta}$} & \textbf{Sai số chuẩn (SE)} & \textbf{$t$-statistic} & \textbf{$p$-value} & \textbf{Khoảng tin cậy 95\%} \\
+        \midrule
+        $\beta_0$ (Intercept) & 2.850456 & 0.230294 & 12.377464 & $1.34 \times 10^{-21}$ & $[2.3933, \, 3.3075]$ \\
+        $\beta_1$             & 1.780584 & 0.027303 & 65.215421 & $2.63 \times 10^{-81}$ & $[1.7263, \, 1.8347]$ \\
+        $\beta_2$             & -0.912491 & 0.023009 & -39.657972 & $2.49 \times 10^{-61}$ & $[-0.9581, \, -0.8668]$ \\
+        $\beta_3$             & 0.373102 & 0.020368 & 18.318470 & $4.26 \times 10^{-33}$ & $[0.3326, \, 0.4135]$ \\
+        \bottomrule
+    \end{tabular}
+    }
+    \caption{Tổng hợp kết quả kiểm định hệ số hồi quy và khoảng tin cậy trên dữ liệu mô phỏng.}
+    \label{tab:ols_test}
+\end{table}
+
+\subsection{Đa Cộng Tuyến và Hệ Số Phóng Đại Phương Sai (VIF)}
+
+\textbf{a) Lý thuyết:} \\
+Đa cộng tuyến (Multicollinearity) là hiện tượng các biến độc lập trong ma trận thiết kế $X$ có sự tương quan tuyến tính mạnh với nhau. Điều này khiến ma trận $X^T X$ tiến gần đến trạng thái suy biến (gần như không thể nghịch đảo), làm cho các ước lượng OLS trở nên cực kỳ nhạy cảm với những thay đổi nhỏ trong tập dữ liệu và làm bùng nổ phương sai của các hệ số ước lượng.
+
+Để định lượng và phát hiện hiện tượng này, Hệ số phóng đại phương sai (Variance Inflation Factor - VIF) được sử dụng. VIF của biến thứ $j$ được xác định bằng công thức:
+\begin{equation}
+    VIF_j = \frac{1}{1 - R_j^2}
+\end{equation}
+Trong đó, $R_j^2$ là hệ số xác định ($R$-squared) thu được khi tiến hành lập mô hình hồi quy biến độc lập $X_j$ theo tất cả các biến độc lập còn lại. Nếu $VIF_j > 10$, biến $X_j$ đang gặp vấn đề đa cộng tuyến nghiêm trọng và cần được xử lý.
+
+\textbf{b) Cài đặt \& Minh họa thực nghiệm:} \\
+Hàm \texttt{vif(X)} được nhóm tự xây dựng bằng cách lặp qua từng đặc trưng, tách đặc trưng đó làm biến mục tiêu và tái sử dụng chính hàm \texttt{ols\_fit} để tìm ra $R_j^2$. 
+
+Khi cố tình thêm nhiễu nhân bản tạo thành tương quan tuyến tính mạnh giữa biến 2 và biến 3 trong tập giả lập, thuật toán tính toán được:
+\begin{itemize}
+    \item VIF $X_1$: 1.0102
+    \item VIF $X_2$: 76950.8614
+    \item VIF $X_3$: 76948.4722
+\end{itemize}
+Các giá trị $VIF \gg 10$ chứng tỏ hiện tượng đa cộng tuyến hoàn hảo đã diễn ra, làm ma trận thiết kế gần như suy biến.
+
+\subsection{Ridge Regression và K-Fold Cross Validation}
+
+\textbf{a) Lý thuyết:} \\
+Trong trường hợp tập dữ liệu thực tế vi phạm giả thiết GM2 (xuất hiện đa cộng tuyến nghiêm trọng), kỹ thuật kiểm soát \textit{Regularization} sẽ được áp dụng. Hồi quy Ridge (sử dụng hàm phạt chuẩn $L_2$) khắc phục vấn đề ma trận suy biến bằng cách cộng thêm một ma trận đường chéo $\lambda I$ vào $X^T X$:
+\begin{equation}
+    \hat{\beta}_{ridge} = \arg\min_{\beta} \left\{ \|y - X\beta\|_2^2 + \lambda \|\beta_{1:p}\|_2^2 \right\} = (X^T X + \lambda I_{mod})^{-1} X^T y
+\end{equation}
+Trong đó, $\lambda \ge 0$ là siêu tham số kiểm soát mức độ phạt. Đặc biệt, ma trận $I_{mod}$ là ma trận đơn vị nhưng có phần tử đầu tiên $I_{0,0} = 0$ nhằm đảm bảo \textbf{không áp dụng hình phạt lên hệ số chặn (intercept)}.
+
+Để tìm ra siêu tham số $\lambda$ tối ưu có khả năng tổng quát hóa tốt nhất, kỹ thuật \textit{k-Fold Cross-Validation} được áp dụng. Tập dữ liệu huấn luyện được chia ngẫu nhiên làm $k$ phần (folds). Lần lượt mô hình được huấn luyện trên $k-1$ phần và đánh giá MSE trên phần còn lại. Mức lỗi chéo trung bình (CV Score) được tính toán như sau:
+\begin{equation}
+    CV_{(k)} = \frac{1}{k} \sum_{i=1}^{k} MSE_i
+\end{equation}
+
+\textbf{b) Kết quả thực nghiệm:} \\
+Đồ thị \textit{Ridge Trace} (Hình \ref{fig:ridge_trace}) thu được từ thực nghiệm minh họa rất rõ cơ chế co rút (shrinkage): khi cường độ phạt $\lambda$ tăng lên, giá trị tuyệt đối của các hệ số hồi quy bị ép dần về $0$. Điều này giúp giảm thiểu phương sai (Variance) của ước lượng so với OLS truyền thống, đánh đổi lấy một chút độ chệch (Bias) nhằm tối ưu hóa sai số dự đoán tổng thể.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{Images/part1_img_0.png}
+    \caption{Ridge Trace minh họa sự co rút của các hệ số hồi quy khi $\lambda$ thay đổi.}
+    \label{fig:ridge_trace}
+\end{figure}
+
+\subsection{Phân Tích Phần Dư (Residual Analysis)}
+Theo giả thiết Gauss-Markov, phần dư phải phân phối chuẩn và có phương sai đồng đều. Để kiểm chứng trực quan việc mô hình có thực sự thỏa mãn các giả thiết hình học và phân phối Gauss-Markov kinh điển hay không, đồ thị chẩn đoán 4 panel (Hình \ref{fig:residuals}) được thiết lập chuyên biệt từ module \texttt{residual\_analysis.py}:
+\begin{itemize}
+    \item \textbf{Residuals vs Fitted:} Các điểm phần dư phân tán ngẫu nhiên, không tạo thành các cấu trúc phi tuyến dạng phễu hay parabol, minh chứng cho tính tuyến tính của mô hình.
+    \item \textbf{Normal Q-Q Plot:} Các điểm giá trị hội tụ rất sát và nằm dọc theo đường thẳng tham chiếu lý tưởng, xác nhận sai số tuân thủ phân phối chuẩn một cách nghiêm ngặt (thỏa mãn giả thiết GM5).
+    \item \textbf{Scale-Location:} Đường mượt xu hướng (smooth line) duy trì trạng thái nằm ngang ổn định, chứng minh hiện tượng phương sai sai số đồng nhất được đảm bảo tại mọi điểm dự báo (thỏa mãn giả thiết GM4).
+    \item \textbf{Cook's Distance:} Giá trị khoảng cách Cook của toàn bộ các quan sát đều nằm dưới ngưỡng cảnh báo rủi ro, khẳng định tập dữ liệu thực nghiệm ổn định và không chịu sự ảnh hưởng cực đoan từ bất kỳ điểm dị biệt (outlier) nào.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{Images/part1_img_1.png}
+    \caption{Bốn biểu đồ phân tích phần dư tiêu chuẩn (Gauss-Markov Diagnostics).}
+    \label{fig:residuals}
+\end{figure}
+
+\subsection{Minh Họa Định Lý Gauss-Markov}
+Định lý cốt lõi Gauss-Markov khẳng định OLS là ước lượng tuyến tính không chệch tốt nhất (BLUE - Best Linear Unbiased Estimator). Bằng việc sử dụng mô phỏng Monte Carlo lặp lại 2000 lần, nhóm đã phác họa lại phân phối của OLS và so sánh trực tiếp với một ước lượng kém tối ưu hơn (có thêm nhiễu chệch).
+Kết quả thực tế cho thấy:
+\begin{itemize}
+    \item Phương sai của ước lượng OLS: \textbf{0.000948} (đỉnh phân phối rất hẹp và nhọn).
+    \item Phương sai của ước lượng khác: \textbf{29006.167451} (đỉnh bẹt, phương sai bùng nổ vượt tầm kiểm soát).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Images/part1_img_2.png}
+    \caption{Phân phối Monte Carlo minh họa rõ nét tính chất BLUE của Định lý Gauss-Markov.}
+\end{figure}
+
+\newpage
 \section{Phần 2: Ứng Dụng Dữ Liệu Thực Tế}
 
-\subsection{Giới thiệu bộ dữ liệu AirQualityUCI}
-Bộ dữ liệu AirQualityUCI chứa các bản ghi đo lường chất lượng không khí tại một thành phố bị ô nhiễm ở Ý. Mục tiêu chính của đồ án là xây dựng mô hình dự đoán nồng độ khí CO (thông qua biến mục tiêu \texttt{CO(GT)}) dựa trên các chỉ số cảm biến đa lượng khác có trong tập dữ liệu.
+\subsection{Giới Thiệu và Khám Phá Dữ Liệu (EDA)}
+Để đánh giá tính ứng dụng của OLS trong điều kiện thực tiễn, nhóm lựa chọn sử dụng bộ dữ liệu \textbf{Air Quality UCI} thu thập thông tin về chất lượng không khí, được tổng hợp từ cảm biến đa lượng tại một thành phố nhộn nhịp của Ý. Biến mục tiêu cần dự đoán là nồng độ khí CO (\texttt{CO(GT)}). Quá trình Khám phá dữ liệu (EDA) chi tiết được trình bày như sau:
 
-\subsection{Tiền xử lý dữ liệu}
-Trong bộ dữ liệu thô này, các giá trị bị thiếu (missing values) được đánh dấu mặc định bằng số \texttt{-200}. Bước tiền xử lý dữ liệu (đóng gói qua OOP Data Pipeline) thực hiện chuyển đổi toàn bộ \texttt{-200} thành \texttt{NaN}, loại bỏ hoàn toàn các cột nhiễu lớn như \texttt{NMHC(GT)}, và áp dụng kỹ thuật Listwise deletion cho biến mục tiêu. Các biến đầu vào sau đó được điền khuyết tự động bằng thuật toán \texttt{KNNImputer}, xử lý giá trị ngoại lai (Outliers) bằng cắt khoảng Winsorization và cuối cùng chuẩn hóa Z-score bằng \texttt{StandardScaler}.
+\textbf{1. Phân tích Dữ liệu Khuyết (Missing Values):} \\
+Dữ liệu gốc sử dụng mã \texttt{-200} để đánh dấu lỗi thiết bị phần cứng. Nhóm đã chuyển đổi các điểm này về dạng \texttt{NaN} trước khi thống kê. Bảng tỷ lệ thiếu hụt mới nhất được trích xuất từ dữ liệu:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lc|lc}
+        \toprule
+        \textbf{Đặc trưng} & \textbf{Tỷ lệ thiếu (\%)} & \textbf{Đặc trưng} & \textbf{Tỷ lệ thiếu (\%)} \\
+        \midrule
+        \texttt{NO2(GT)} & 5.42\% & \texttt{PT08.S4(NO2)} & 4.30\% \\
+        \texttt{NOx(GT)} & 5.38\% & \texttt{PT08.S5(O3)} & 4.30\% \\
+        \texttt{C6H6(GT)} & 4.30\% & \texttt{T (Nhiệt độ)} & 4.30\% \\
+        \texttt{PT08.S1(CO)} & 4.30\% & \texttt{RH (Độ ẩm)} & 4.30\% \\
+        \texttt{PT08.S2(NMHC)} & 4.30\% & \texttt{AH} & 4.30\% \\
+        \texttt{PT08.S3(NOx)} & 4.30\% & & \\
+        \bottomrule
+    \end{tabular}
+    \caption{Tỷ lệ dữ liệu bị khuyết trên các thuộc tính cảm biến.}
+\end{table}
+*(Ghi chú: Biến NMHC(GT) bị khuyết đến 90\% nên đã bị loại bỏ hoàn toàn trong bước thu thập. Dữ liệu khảo sát trên không chứa biến mục tiêu CO do đã được tách riêng làm biến label y).*
 
-\subsection{Xây dựng và đánh giá mô hình}
-Dựa trên tập dữ liệu đã qua tiền xử lý chặt chẽ, ba mô hình hồi quy đã được xây dựng và đưa lên bàn cân so sánh:
-\begin{enumerate}
-    \item \textbf{Mô hình 1 (OLS Cơ bản):} Sử dụng tất cả các đặc trưng để huấn luyện.
-    \item \textbf{Mô hình 2 (OLS Chọn biến):} Lọc bỏ các biến có Hệ số phóng đại phương sai (VIF) $> 10$ để giảm hiện tượng đa cộng tuyến.
-    \item \textbf{Mô hình 3 (Ridge Regression):} Tối ưu hóa siêu tham số $\lambda$ thông qua 5-Fold Cross Validation trên tập Train.
-\end{enumerate}
-Bảng so sánh kết quả cuối cùng chứng minh cả ba mô hình đều cho thấy hiệu suất khả quan trên tập kiểm thử thông qua các chỉ số $R^2$, MAE, và RMSE.
+\textbf{2. Khảo sát Phân Phối và Outlier:} \\
+Phương pháp định lượng IQR (Interquartile Range) được lập trình để rà quét ngoại lệ. Lấy ví dụ, biến \texttt{PT08.S1(CO)} phát hiện được chính xác \textbf{90 điểm outliers} nằm trượt ra khỏi các râu (whiskers) của Boxplot. Hiện tượng lệch dữ liệu là khá phổ biến với dòng cảm biến khí.
 
-\subsection{Phân tích phần dư \& Kỹ thuật nâng cao}
-Phần dư (Residuals) được phân tích để kiểm định độ tin cậy của mô hình tuyến tính. Đặc biệt, để lấy điểm kỹ thuật nâng cao, lớp \texttt{Bayesian Linear Regression} cũng được cài đặt hoàn toàn từ đầu (from scratch) bằng Numpy. Mô hình Bayes không chỉ dự đoán được giá trị điểm (Point Estimate) mà còn tính toán thành công phương sai dự đoán, cung cấp một góc nhìn toán học sâu sắc về độ không chắc chắn (Uncertainty) trong học máy.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{Images/eda_distribution_1.png}
+    \caption{Biểu đồ Histogram (phân phối) và Boxplot (chẩn đoán ngoại lệ) của tất cả đặc trưng (Phần 1).}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{Images/eda_distribution_2.png}
+    \caption{Biểu đồ Histogram (phân phối) và Boxplot (chẩn đoán ngoại lệ) của tất cả đặc trưng (Phần 2).}
+\end{figure}
+
+\textbf{3. Phân tích Hiện tượng Đa cộng tuyến:} \\
+Ma trận tương quan Pearson hiển thị cảnh báo: rất nhiều bộ phận cảm biến có sự tương quan tuyến tính chồng chéo nghiêm trọng ($r > 0.8$), chẳng hạn như C6H6 và PT08.S2. Đây là tiền đề bắt buộc phải áp dụng hồi quy phạt (Ridge) hoặc chọn lọc biến.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Images/eda_heatmap.png}
+    \caption{Ma trận tương quan Pearson đo lường mức độ chồng chéo giữa các cảm biến (Heatmap).}
+\end{figure}
+
+\subsection{Xây Dựng và Đánh Giá Mô Hình}
+Tiền xử lý tuân thủ tuyệt đối cơ chế chống rò rỉ dữ liệu (Data Leakage). Pipeline thiết lập các bước tuần tự bao gồm: \texttt{KNNImputer(k=5)}, \texttt{Winsorization(1\%-99\%)} cắt ngọn các nhiễu gai, và chuẩn hóa với \texttt{StandardScaler}. Cả 3 phương pháp hồi quy tuyến tính được huấn luyện độc lập:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lrrr}
+        \toprule
+        \textbf{Mô hình (Tập kiểm thử 20\%)} & \textbf{MAE} & \textbf{RMSE} & \textbf{$R^2$-Score} \\
+        \midrule
+        OLS Cơ bản & 0.2876 & 0.4615 & 0.8977 \\
+        OLS Lọc VIF (Bỏ các biến VIF > 10) & 0.3348 & 0.5087 & 0.8757 \\
+        Ridge Regression ($\lambda = 0.70$) & 0.2876 & 0.4616 & 0.8977 \\
+        \bottomrule
+    \end{tabular}
+    \caption{So sánh hiệu năng 3 phương pháp hồi quy tuyến tính ứng dụng.}
+\end{table}
+
+\textbf{Đánh giá kết quả:}
+\begin{itemize}
+    \item \textbf{Mất mát thông tin ở Mô hình Lọc VIF:} Việc cắt bỏ các cột đặc trưng có $VIF > 10$ một cách thô bạo khiến hiệu năng mô hình sụt giảm rõ rệt (Sai số MAE và RMSE đều tăng, $R^2$ tụt từ 0.8977 xuống 0.8757). Điều này tái khẳng định rằng các biến dù bị đa cộng tuyến nhưng thực tế vẫn chứa "tín hiệu mờ" quan trọng cho bài toán.
+    \item \textbf{Tối ưu của Regularization:} Ridge với tham số tối ưu thông qua quá trình K-Fold Cross Validation ($\lambda=0.70$) xử lý cực kỳ thông minh hiện tượng bùng nổ phương sai của hệ số góc $\beta$, giữ vững cấu trúc mô hình, đồng thời duy trì được hiệu năng lý tưởng tương đương OLS nguyên bản.
+\end{itemize}
+
+\subsection{Giải thích Mô hình (Feature Importance)}
+Khác với mạng Neural Network, Hồi quy tuyến tính mang tính minh bạch (interpretability) cực cao. Nhóm đã trích xuất lại hệ số hồi quy Ridge sau khi dữ liệu đã chuẩn hóa chung về không gian trung bình 0, độ lệch chuẩn 1 để hình thành thước đo Feature Importance:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Images/feature_importance.png}
+    \caption{Feature Importance (Tầm quan trọng đặc trưng) rút trích từ hệ số Ridge Regression.}
+\end{figure}
+
+**Nhận xét hóa-lý học:** Kết quả thuật toán phát hiện \texttt{PT08.S1(CO)} và \texttt{PT08.S5(O3)} đóng vai trò trọng yếu mang tính áp đảo đối với việc xác định nồng độ khí CO. Về cấu tạo vật liệu, cảm biến Tin Oxide (SnO2) vốn phản ứng oxi hóa khử vô cùng nhạy bén trước CO và Ozone, dẫn đến điện trở bị thay đổi đột ngột. Sự ăn khớp kinh ngạc giữa phân tích Toán Học và bản chất Vật Lý/Hóa Học chính là giá trị to lớn nhất mà Data Fitting đem lại.
+
+\subsection{Kỹ Thuật Nâng Cao: Hồi Quy Tuyến Tính Bayes (Bayesian Linear Regression)}
+
+\textbf{a) Lý thuyết và Thiết lập mô hình:} \\
+Khác với phương pháp OLS hay Ridge (Frequentist approach) chỉ đưa ra một điểm ước lượng duy nhất (Point Estimate) cho các hệ số $\beta$, Hồi quy tuyến tính Bayes (Bayesian Linear Regression) tiếp cận bài toán dưới góc độ xác suất. Các tham số $\beta$ được xem là các biến ngẫu nhiên tuân theo một phân phối tiên nghiệm (Prior distribution):
+\begin{equation}
+    \beta \sim \mathcal{N}(m_0, S_0)
+\end{equation}
+Với giả thiết nhiễu tuân theo phân phối chuẩn $y|x,\beta \sim \mathcal{N}(x^T\beta, \sigma^2)$, theo định lý Bayes, ta cập nhật được phân phối hậu nghiệm (Posterior distribution) của $\beta$ sau khi quan sát dữ liệu $X, y$:
+\begin{equation}
+    \beta|X,y \sim \mathcal{N}(m_n, S_n)
+\end{equation}
+Trong đó, ma trận hiệp phương sai hậu nghiệm $S_n$ và vector kỳ vọng hậu nghiệm $m_n$ được xác định bởi:
+\begin{equation}
+    S_n = \left( S_0^{-1} + \frac{1}{\sigma^2}X^T X \right)^{-1}
+\end{equation}
+\begin{equation}
+    m_n = S_n \left( S_0^{-1}m_0 + \frac{1}{\sigma^2}X^T y \right)
+\end{equation}
+Ưu điểm vượt trội của mô hình Bayes là khả năng cung cấp thông tin về \textbf{Độ không chắc chắn (Uncertainty Estimation)}. Dự đoán cho một điểm dữ liệu mới $x_{new}$ không chỉ là một giá trị vô hướng, mà là một phân phối chuẩn với phương sai dự đoán bao gồm cả nhiễu hệ thống và sự không chắc chắn của tham số.
+
+\textbf{b) Kết quả thực nghiệm:} \\
+Mô hình \texttt{Bayesian Linear Regression} được nhóm lập trình hoàn toàn từ đầu (from scratch). Kết quả thử nghiệm trên tập Test cho thấy, giá trị dự đoán trung bình (Mean Prediction) của Bayesian Regression mang lại sai số rất sát với mô hình Ridge (MAE $\approx 0.2876$, $R^2 \approx 0.8977$).
+
+Tuy nhiên, giá trị cốt lõi mà mô hình này mang lại nằm ở \textbf{Khoảng tin cậy dự đoán (Credible Intervals)}. Đối với các điểm dữ liệu kiểm thử nằm xa vùng phân bố của tập huấn luyện, mô hình Bayes tự động nới rộng phương sai dự báo, cảnh báo cho người dùng về mức độ thiếu chắc chắn của dự đoán. Điều này mang ý nghĩa thực tiễn cực kỳ to lớn đối với các hệ thống ra quyết định rủi ro trong y tế, tài chính và quan trắc môi trường.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Images/bayesian_uncertainty.png}
+    \caption{Khoảng tin cậy dự báo 95\% (Uncertainty Estimation) của Bayesian Linear Regression.}
+\end{figure}
 
 \section{Kết Luận}
-Đồ án đã hoàn thành xuất sắc mục tiêu đề ra, bao quát từ quy trình lập trình cốt lõi các thuật toán Toán Ứng dụng khắt khe chỉ bằng thư viện cơ bản Numpy, cho đến việc tự thiết kế hệ thống Data Pipeline chống thất thoát dữ liệu (Data Leakage) và áp dụng mượt mà trên bộ dữ liệu thực tế AirQualityUCI. Phương pháp OLS, Ridge và Bayesian đều chứng minh được tầm quan trọng sống còn của Đại số tuyến tính trong khoa học dữ liệu.
+Đồ án đã hoàn thành xuất sắc và toàn diện cả hai mục tiêu: lý thuyết toán học và ứng dụng thực tiễn. Nhóm đã tự cài đặt thành công 100\% các thuật toán cốt lõi (OLS, Ridge, Bayesian) và các công cụ thống kê (K-Fold CV, VIF, Residual Analysis) bằng Đại số tuyến tính, cũng như thực hiện toàn vẹn Pipeline khoa học dữ liệu. Phương pháp OLS, Ridge và Hồi quy Bayes đã chứng minh được tầm quan trọng sống còn của Đại số tuyến tính trong việc xây dựng nền tảng vững chắc cho Khoa học dữ liệu.
 
 \newpage
 % --- REFERENCES ---
@@ -94,7 +405,7 @@ Phần dư (Residuals) được phân tích để kiểm định độ tin cậy
 \bibitem{strang} 
 Gilbert Strang. 
 \textit{Linear Algebra and Its Applications}. 
-Cengage Learning, 4th Edition.
+Cengage Learning, 4th Edition, 2005.
 
 \bibitem{james} 
 Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 
@@ -105,6 +416,16 @@ Springer, 2013.
 Christopher M. Bishop. 
 \textit{Pattern Recognition and Machine Learning}. 
 Springer, 2006.
+
+\bibitem{uci} 
+Saverio De Vito.
+\textit{Air Quality Dataset}. 
+UCI Machine Learning Repository, 2008. [Online]. Available: \url{https://archive.ics.uci.edu/dataset/36/air+quality}.
+
+\bibitem{pandas} 
+Wes McKinney. 
+\textit{Data Structures for Statistical Computing in Python}. 
+Proceedings of the 9th Python in Science Conference, 51-56, 2010.
 
 \end{thebibliography}
 
